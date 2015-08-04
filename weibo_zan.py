@@ -11,14 +11,28 @@ except ImportError:
 
 
 def get_mid():
-	user_page = urllib2.urlopen('http://www.weibo.com/5648162302').read()
 
-	midIndex = user_page.find('mid=\\\"')
-	startIndex = midIndex + 6
-	midEndIndex = user_page.find('\\\"', startIndex)
-	mid = user_page[startIndex : midEndIndex]
+	user_page = urllib2.urlopen('http://www.weibo.com/5648162302').read()
+	beg = 0
+	for i in range(0, 4):
+		midIndex = user_page.find('mid=\\\"', beg)
+		startIndex = midIndex + 6
+		midEndIndex = user_page.find('\\\"', startIndex)
+		mid = user_page[startIndex : midEndIndex]
 	
-	return mid
+		likeTarget = 'version=mini&qid=heart&mid=' + mid + '&loc=profile\\\" title=\\\"赞\\\"'
+		likeTargetIndex = user_page.find(likeTarget, midEndIndex)
+		if likeTargetIndex > 0:
+			return mid
+		
+		unLikeTarget = 'version=mini&qid=heart&mid=' + mid + '&loc=profile\\\" title=\\\"取消赞\\\"'
+		unLikeTargetIndex = user_page.find(unLikeTarget, midEndIndex)
+		if unLikeTargetIndex < 0:
+			print 'ERROR: unLikeTargetIndex=' + str(unlikeTargetIndex)
+			return ''
+		beg = unLikeTargetIndex
+
+	return ''
 
 def like_mid(mid):
 
